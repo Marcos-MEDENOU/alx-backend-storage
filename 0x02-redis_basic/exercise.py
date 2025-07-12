@@ -45,53 +45,25 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
-# def replay(method: Callable) -> None:
-#     # sourcery skip: use-fstring-for-concatenation, use-fstring-for-formatting
-#     """
-#     Replays the history of a function
-#     Args:
-#         method: The function to be decorated
-#     Returns:
-#         None
-#     """
-#     name = method.__qualname__
-#     cache = redis.Redis()
-#     calls = cache.get(name).decode("utf-8")
-#     print("{} was called {} times:".format(name, calls))
-#     inputs = cache.lrange(name + ":inputs", 0, -1)
-#     outputs = cache.lrange(name + ":outputs", 0, -1)
-#     for i, o in zip(inputs, outputs):
-#         print("{}(*{}) -> {}".format(name, i.decode('utf-8'),
-#                                      o.decode('utf-8')))
-
 def replay(method: Callable) -> None:
+    # sourcery skip: use-fstring-for-concatenation, use-fstring-for-formatting
     """
     Replays the history of a function
-    
     Args:
         method: The function to be decorated
+    Returns:
+        None
     """
     name = method.__qualname__
     cache = redis.Redis()
-    
-    # Get the number of calls
-    call_count = cache.get(name)
-    if not call_count:
-        print(f"{name} was never called.")
-        return
-    
-    call_count = call_count.decode('utf-8')
-    print(f"{name} was called {call_count} times:")
-    
-    # Get input and output lists
-    inputs = cache.lrange(f"{name}:inputs", 0, -1)
-    outputs = cache.lrange(f"{name}:outputs", 0, -1)
-    
-    # Print each call with its input and output
-    for args, output in zip(inputs, outputs):
-        args = args.decode('utf-8')
-        output = output.decode('utf-8')
-        print(f"{name}(*{args}) -> {output}")
+    calls = cache.get(name).decode("utf-8")
+    print("{} was called {} times:".format(name, calls))
+    inputs = cache.lrange(name + ":inputs", 0, -1)
+    outputs = cache.lrange(name + ":outputs", 0, -1)
+    for i, o in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(name, i.decode('utf-8'),
+                                     o.decode('utf-8')))
+
 
 class Cache:
     '''
